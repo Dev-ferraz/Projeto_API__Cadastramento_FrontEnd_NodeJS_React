@@ -22,7 +22,7 @@ const Usuario = () => {
         senha: '',
         email: '',
     };
-
+    
     const [usuarios, setUsuarios] = useState<Projeto.Usuario[]>([]);
     const [usuarioDialog, setUsuarioDialog] = useState(false);
     const [deleteUsuarioDialog, setDeleteUsuarioDialog] = useState(false);
@@ -33,26 +33,25 @@ const Usuario = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-//-----------------------------------------------------------------------------------------------
+    
+//configuração useEffectcontrolar quando e como os efeitos devem ser executados, através da lista de dependências
     useEffect(() => {
         if(usuarios.length == 0)
         usuarioService.ListarTodos()
             .then((response) => {
                 console.log(response.data);
                 if (Array.isArray(response.data)) {
-                    setUsuarios(response.data); // Atualizar com os dados recebidos
+                    setUsuarios(response.data);
                 } else {
-                    setUsuarios([]); // Se não for um array, definir como array vazio
+                    setUsuarios([]); 
                 }
             })
             .catch((error) => {
                 console.error(error);
-                setUsuarios([]); // Em caso de erro, garantir que `usuarios` seja um array vazio
+                setUsuarios([]); 
             });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [usuarioService, usuario]);
 
-//-----------------------------------------------------------------------------------------------
 
     const openNew = () => {
         setUsuario(usuarioVazio);
@@ -72,8 +71,8 @@ const Usuario = () => {
     const hideDeleteUsuariosDialog = () => {
         setDeleteUsuariosDialog(false);
     };
-//---------------------------------------------------------------------
-//   Onde eu chamo meu front-end
+
+// saveUsuario Onde eu chamo meu front-end
 const saveUsuario = () => {
     setSubmitted(true);
 
@@ -85,43 +84,41 @@ const saveUsuario = () => {
                 setUsuarioDialog(false);
                 setUsuarios ([]);
                 toast.current?.show({
-                    severity: 'success', // Alterado de 'info' para 'success'
+                    severity: 'success',
                     summary: 'Sucesso!',
                     detail: 'Usuário cadastrado com sucesso!'
                 });
             }).catch((error) => {
-                console.error(error.response.data.message); // Alterado para error.response
+                console.error(error.response.data.message); 
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Erro!',
-                    detail: 'Erro ao salvar! ' + error.response.data.message // Alterado para error.response
+                    detail: 'Erro ao salvar! ' + error.response.data.message 
                 });
             });
     } else {
         usuarioService.alterar(usuario.id, usuario)
             .then((response) => {
                 const updatedUsuarios = usuarios.map((u) => (u.id === usuario.id ? response.data : u));
-                setUsuarios(updatedUsuarios); // Adicionado para atualizar a lista de usuários
+                setUsuarios(updatedUsuarios); 
                 setUsuario(usuarioVazio);
                 setUsuarioDialog(false);
                 setUsuarios ([]);
                 toast.current?.show({
-                    severity: 'success', // Alterado de 'error' para 'success'
+                    severity: 'success', 
                     summary: 'Sucesso!',
                     detail: 'Usuário alterado com sucesso!'
                 });
             }).catch((error) => {
-                console.error(error.response.data.message); // Alterado para error.response
+                console.error(error.response.data.message); 
                 toast.current?.show({
                     severity: 'error',
                     summary: 'Erro!',
-                    detail: 'Erro ao alterar! ' + error.response.data.message // Alterado para error.response
+                    detail: 'Erro ao alterar! ' + error.response.data.message 
                 });
-            });
+          });
     }
 };
-
-//-----------------------------------------------------------------
 
     const editUsuario = (usuario: Projeto.Usuario) => {
         setUsuario({ ...usuario });
@@ -132,12 +129,12 @@ const saveUsuario = () => {
         setUsuario(usuario);
         setDeleteUsuarioDialog(true);
     };
-//------------------------------------------------------------------
-//Deletar------------
+
+    
+//deleteUsuario - onde deleto meus usuários
 const deleteUsuario = () => {
     if (usuario.id) {
         usuarioService.excluir(usuario.id).then((response) => {
-            // Aqui, você pode atualizar a lista de usuários em vez de limpá-la
             setUsuarios(prevUsuarios => prevUsuarios.filter(u => u.id !== usuario.id));
             setUsuario(usuarioVazio);
             setDeleteUsuarioDialog(false);
@@ -158,9 +155,6 @@ const deleteUsuario = () => {
     }
 };
 
-
-    //----------------------------------------
-
     const exportCSV = () => {
         dt.current?.exportCSV();
     };
@@ -168,10 +162,9 @@ const deleteUsuario = () => {
     const confirmDeleteSelected = () => {
         setDeleteUsuariosDialog(true);
     };
+    
 
-
-//--------------------------------------------
-//deletar varios usuários
+//deletar todos os usuários selecionados
     const deleteSelectedUsuarios = () => {
 
         Promise.all(selectedUsuarios?.map(async (_usuario) => {
@@ -203,7 +196,7 @@ const deleteUsuario = () => {
 
         setDeleteUsuariosDialog(false);
     };
-//-------------------------------------------------------------------
+
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nome: string) => {
         const val = e.target.value || '';
         let _usuario = { ...usuario };
@@ -391,6 +384,5 @@ const deleteUsuario = () => {
         </div>
     );
 };
-
 
 export default Usuario;
